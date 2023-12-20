@@ -2,6 +2,7 @@ package dev.victorvazquez.repository;
 
 import dev.victorvazquez.model.Employee;
 import dev.victorvazquez.util.DatabaseConnection;
+import dev.victorvazquez.util.DatabasePoolConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,14 +10,15 @@ import java.util.List;
 
 public class EmployeeRepository implements Repository<Employee>{
     private Connection getConnection() throws SQLException {
-        return DatabaseConnection.getInstance();
+        return DatabasePoolConnection.getConnection();
     }
 
     @Override
     public List<Employee> findAll() throws SQLException {
         List<Employee> employees = new ArrayList<>();
 
-        try(Statement myStamt = getConnection().createStatement();
+        try(    Connection cnn = getConnection();
+                Statement myStamt = cnn.createStatement();
             ResultSet myRes = myStamt.executeQuery("SELECT * FROM employees")){
             while (myRes.next()) {
                 employees.add(createEmployee(myRes));
@@ -30,7 +32,7 @@ public class EmployeeRepository implements Repository<Employee>{
     public Employee getById(Integer id) throws SQLException {
         Employee employee = null;
 
-        try(PreparedStatement myStamt = getConnection().prepareStatement("SELECT * FROM employees WHERE id=?;")){
+        try(Connection cnn = getConnection(); PreparedStatement myStamt = cnn.prepareStatement("SELECT * FROM employees WHERE id=?;")){
             myStamt.setInt(1,id);
             try(ResultSet myRes = myStamt.executeQuery()) {
                 if(myRes.next()) {
@@ -46,7 +48,7 @@ public class EmployeeRepository implements Repository<Employee>{
     public void save(Employee employee) throws SQLException {
         employee.setId(null);
 
-        try(PreparedStatement myStatement = getConnection().prepareStatement("INSERT INTO employees (first_name,pa_surname,ma_surname,email,salary) VALUES(?,?,?,?,?);")) {
+        try(Connection cnn = getConnection(); PreparedStatement myStatement = cnn.prepareStatement("INSERT INTO employees (first_name,pa_surname,ma_surname,email,salary) VALUES(?,?,?,?,?);")) {
             myStatement.setString(1, employee.getFirst_name());
             myStatement.setString(2, employee.getPa_surname());
             myStatement.setString(3, employee.getMa_surname());
@@ -68,7 +70,7 @@ public class EmployeeRepository implements Repository<Employee>{
 
     @Override
     public void delete(Integer id) throws SQLException {
-        try(PreparedStatement myStatement = getConnection().prepareStatement("DELETE FROM employees WHERE id=?;")){
+        try(Connection cnn = getConnection(); PreparedStatement myStatement = cnn.prepareStatement("DELETE FROM employees WHERE id=?;")){
             myStatement.setInt(1, id);
 
             int rowsAffected = myStatement.executeUpdate();

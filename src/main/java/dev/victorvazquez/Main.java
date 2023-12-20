@@ -10,7 +10,7 @@ import java.sql.*;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        try(Connection myConn = DatabaseConnection.getInstance();) {
+        try {
             Repository<Employee> repository = new EmployeeRepository();
 
             //* Save new employee
