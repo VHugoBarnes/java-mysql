@@ -43,13 +43,45 @@ public class EmployeeRepository implements Repository<Employee>{
     }
 
     @Override
-    public void save(Employee employee) {
+    public void save(Employee employee) throws SQLException {
+        employee.setId(null);
 
+        try(PreparedStatement myStatement = getConnection().prepareStatement("INSERT INTO employees (first_name,pa_surname,ma_surname,email,salary) VALUES(?,?,?,?,?);")) {
+            myStatement.setString(1, employee.getFirst_name());
+            myStatement.setString(2, employee.getPa_surname());
+            myStatement.setString(3, employee.getMa_surname());
+            myStatement.setString(4, employee.getEmail());
+            myStatement.setFloat(5, employee.getSalary());
+
+            int rowsAffected = myStatement.executeUpdate();
+
+            if(rowsAffected > 0) {
+                return;
+            } else {
+                throw new SQLException("[sql-error]");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("[sql-error]");
+        }
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer id) throws SQLException {
+        try(PreparedStatement myStatement = getConnection().prepareStatement("DELETE FROM employees WHERE id=?;")){
+            myStatement.setInt(1, id);
 
+            int rowsAffected = myStatement.executeUpdate();
+
+            if(rowsAffected > 0) {
+                return;
+            } else {
+                System.out.println("Employee with id:"+id+" not found");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new SQLException("[sql-error]");
+        }
     }
 
     private static Employee createEmployee(ResultSet myRes) throws SQLException {

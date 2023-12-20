@@ -13,9 +13,28 @@ public class Main {
         try(Connection myConn = DatabaseConnection.getInstance();) {
             Repository<Employee> repository = new EmployeeRepository();
 
+            //* Save new employee
+            Employee nicoleEmployee = new Employee();
+            nicoleEmployee.setSalary(3_000_000f);
+            nicoleEmployee.setEmail("nicole@gmail.com");
+            nicoleEmployee.setFirst_name("Nicole");
+            nicoleEmployee.setPa_surname("Rodriguez");
+            nicoleEmployee.setMa_surname("Gonzalez");
+
+
+            repository.save(nicoleEmployee);
+
+            //* Find all employees
             repository.findAll().forEach(System.out::println);
             System.out.println("============================");
-            System.out.println(repository.getById(1));;
+
+            //* Delete employee
+            repository.delete(1);
+
+            //* Find one employee
+            System.out.println(repository.getById(1));
+
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Something went wrong");
