@@ -1,15 +1,13 @@
 package dev.victorvazquez;
 
+import dev.victorvazquez.util.DatabaseConnection;
+
 import java.sql.*;
 
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/project";
-        String user = "root";
-        String pwd = "";
-
-        try(Connection myConn = DriverManager.getConnection(url, user, pwd);
+        try(Connection myConn = DatabaseConnection.getInstance();
             Statement myStamt = myConn.createStatement();
             ResultSet myRes = myStamt.executeQuery("SELECT * FROM employees");) {
             while(myRes.next()) {
